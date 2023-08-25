@@ -2,9 +2,21 @@ package main
 
 import (
 	"fmt"
+	"os/exec"
 	"time"
+
 	"github.com/gen2brain/beeep"
 )
+
+func sendNotification(title, message string) {
+	cmd := exec.Command("powershell.exe", "-c",
+		"Add-Type -AssemblyName System.Windows.Forms;"+
+			"[System.Windows.Forms.MessageBox]::Show('"+message+"','"+title+"')")
+	err := cmd.Run()
+	if err != nil {
+		panic(err)
+	}
+}
 
 func main() {
 	for {
@@ -50,8 +62,8 @@ func startTimer(minutes int, sessionType string) {
 			minutes--
 			fmt.Printf("%s - %d minutes left (last tick at %s)\n", sessionType, minutes, t.Format("15:04:05"))
 			if minutes%5 == 0 {
-                beeep.Notify("Pomodoro Timer", fmt.Sprintf("%s - %d minutes left", sessionType, minutes), "")
-            }
+				sendNotification("Pomodoro Timer", fmt.Sprintf("%s - %d minutes left", sessionType, minutes))
+			}
 		}
 	}
 }
